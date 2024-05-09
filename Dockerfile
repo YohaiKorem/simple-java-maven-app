@@ -3,8 +3,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn  clean package
-ARG VERSION=1.0.0
-RUN mvn -B versions:set -Dnewversion=1.0.0
+ARG VERSION
+RUN mvn -B versions:set -DnewVersion=$VERSION
 FROM maven:3.9.0 as test
 WORKDIR /app
 COPY --from=build /app /app
