@@ -18,7 +18,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg VERSION=${{ 1 }} -t yohaikorem/maven_app:${{ 1 }} .
+          docker build --build-arg="VERSION=${{ 1 }}" -t yohaikorem/maven_app:${{ 1 }} .
 
       - name: Push Docker Image
         env:
