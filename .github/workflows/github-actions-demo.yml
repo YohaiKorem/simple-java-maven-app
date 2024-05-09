@@ -18,7 +18,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build --build-arg="VERSION=${{ steps.version.outputs.new_version }}" -t yohaikorem/maven_app:${{ steps.version.outputs.new_version }} .
+          docker build --build-arg="VERSION=${{ 1.0.0 }}" -t yohaikorem/maven_app:${{ 1.0.0 }} .
 
       - name: Push Docker Image
         env:
@@ -26,5 +26,5 @@ jobs:
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
-          docker tag yohaikorem/maven_app:${{ steps.version.outputs.new_version }} yohaikorem/maven_app:latest
-          docker push yohaikorem/maven_app:${{ steps.version.outputs.new_version }}
+          docker tag yohaikorem/maven_app:${{ 1.0.0 }} yohaikorem/maven_app:latest
+          docker push yohaikorem/maven_app:${{ 1.0.0 }}
