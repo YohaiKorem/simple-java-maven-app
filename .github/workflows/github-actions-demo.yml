@@ -22,13 +22,12 @@ jobs:
         shell: bash
         run: echo "${{ steps.extract_branch.outputs.branch }}"
 
-      - name: Increment version number
+      - name: Determine Increment Strategy
         id: version
         shell: bash
         run: |
           BRANCH="${{ steps.extract_branch.outputs.branch }}"
           INCREMENT=""
-
           if [[ "$BRANCH" == "master" ]]; then
             INCREMENT="Minor"
           elif [[ "$BRANCH" == "dev" ]]; then
@@ -36,7 +35,6 @@ jobs:
           else
             INCREMENT="Build"
           fi
-
           echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
 
       - name: Increment and Update Version
@@ -78,18 +76,33 @@ jobs:
           echo "$NEW_VERSION" > "$VERSION_FILE"
           echo "New Version: $NEW_VERSION"
 
+      - name: Print Updated Version
+        shell: bash
+        run: |
+          VERSION=$(cat version.txt)
+          echo "Updated Docker Version: $VERSION"
+
       - name: Check Out Code
         uses: actions/checkout@v4
 
       - name: Build Docker Image
+        shell: bash
         run: |
-          docker build --build-arg="VERSION=${VERSION}" -t yohaikorem/maven_app:${VERSION} .
+          VERSION=$(cat version.txt)
+          if [[ -z "$VERSION" ]]; then
+            echo "Error: Docker version is empty."
+            exit 1
+          fi
+          echo "Building Docker image with version: ${VERSION}"
+          docker build --build-arg="VERSION=${VERSION}" -t "yohaikorem/maven_app:${VERSION}" .
 
       - name: Push Docker Image
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        shell: bash
         run: |
+          VERSION=$(cat version.txt)
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
-          docker tag yohaikorem/maven_app:1 yohaikorem/maven_app:latest
-          docker push yohaikorem/maven_app:1
+          docker tag "yohaikorem/maven_app:${VERSION}" "yohaikorem/maven_app:latest"
+          docker push "yohaikorem/maven_app:${VERSION}"
