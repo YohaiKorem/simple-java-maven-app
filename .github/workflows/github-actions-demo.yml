@@ -18,8 +18,8 @@ jobs:
 
       - name: Set up Java
         uses: actions/setup-java@v3
-        with:
-          java-version: '17'
+        # with:
+        #   java-version: '17'
 
       - name: Cache Maven Dependencies
         uses: actions/cache@v2
