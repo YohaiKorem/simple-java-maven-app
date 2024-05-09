@@ -10,6 +10,5 @@ RUN mvn test
 
 FROM openjdk:17-jdk-alpine as deliver
 WORKDIR /app
-COPY --from=build /app/target/your-app.jar /app/your-app.jar
 COPY ./scripts/deliver.sh /app/deliver.sh
 CMD ["bash", "/app/deliver.sh"]
