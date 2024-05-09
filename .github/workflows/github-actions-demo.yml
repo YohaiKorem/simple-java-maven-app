@@ -13,93 +13,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract Branch Name
+      - name: Extract branch name
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
 
-      - name: Print Branch Name
+      - name: Print branch name
         shell: bash
         run: echo "${{ steps.extract_branch.outputs.branch }}"
 
-      - name: Determine Increment Strategy
+      - name: Increment version number
         id: version
         shell: bash
         run: |
           BRANCH="${{ steps.extract_branch.outputs.branch }}"
           INCREMENT=""
+
           if [[ "$BRANCH" == "master" ]]; then
-            INCREMENT="Major"
-          elif [[ "$BRANCH" == "dev" ]]; then
             INCREMENT="Minor"
-          else
+          elif [[ "$BRANCH" == "dev" ]]; then
             INCREMENT="Patch"
+          else
+            INCREMENT="Build"
           fi
+
           echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
 
-      - name: Initialize Version File if Absent
+      - name: Print Increment Strategy
         shell: bash
-        run: |
-          VERSION_FILE="version.txt"
-          if [[ ! -f "$VERSION_FILE" ]]; then
-            echo "0.1.0" > "$VERSION_FILE"
-            echo "Initialized $VERSION_FILE with default version: 0.1.0"
-          fi
-
-      - name: Increment and Update Semantic Version
-        shell: bash
-        run: |
-          INCREMENT="${{ steps.version.outputs.increment }}"
-          VERSION_FILE="version.txt"
-
-          # Retrieve current version from the file
-          VERSION=$(cat "$VERSION_FILE")
-
-          # Extract the semantic version components
-          MAJOR=$(echo "$VERSION" | cut -d. -f1)
-          MINOR=$(echo "$VERSION" | cut -d. -f2)
-          PATCH=$(echo "$VERSION" | cut -d. -f3)
-
-          # Increment based on the strategy
-          case "$INCREMENT" in
-            "Major")
-              MAJOR=$((MAJOR + 1))
-              MINOR=0
-              PATCH=0
-              ;;
-            "Minor")
-              MINOR=$((MINOR + 1))
-              PATCH=0
-              ;;
-            "Patch")
-              PATCH=$((PATCH + 1))
-              ;;
-          esac
-
-          # Build the new semantic version
-          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-
-          # Update the version file
-          echo "$NEW_VERSION" > "$VERSION_FILE"
-          echo "New Version: $NEW_VERSION"
+        run: echo "${{ steps.version.outputs.increment }}"
 
       - name: Check Out Code
         uses: actions/checkout@v4
 
       - name: Build Docker Image
-        shell: bash
         run: |
-          VERSION=$(cat version.txt)
-          echo "Building Docker image with version: ${VERSION}"
-          docker build --build-arg="VERSION=${VERSION}" -t "yohaikorem/maven_app:${VERSION}" .
+          docker build --build-arg="VERSION=1" -t yohaikorem/maven_app:1 .
 
       - name: Push Docker Image
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-        shell: bash
         run: |
-          VERSION=$(cat version.txt)
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
-          docker tag "yohaikorem/maven_app:${VERSION}" "yohaikorem/maven_app:latest"
-          docker push "yohaikorem/maven_app:${VERSION}"
+          docker tag yohaikorem/maven_app:1 yohaikorem/maven_app:latest
+          docker push yohaikorem/maven_app:1
