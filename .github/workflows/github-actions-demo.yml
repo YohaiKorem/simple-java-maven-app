@@ -13,36 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-
-      - name: Print branch name
-        shell: bash
-        run: echo "${{ steps.extract_branch.outputs.branch }}"
-
-      - name: Increment version number
-        id: version
-        shell: bash
-        run: |
-          BRANCH="${{ steps.extract_branch.outputs.branch }}"
-          INCREMENT=""
-
-          if [[ "$BRANCH" == "master" ]]; then
-            INCREMENT="Minor"
-          elif [[ "$BRANCH" == "dev" ]]; then
-            INCREMENT="Patch"
-          else
-            INCREMENT="Build"
-          fi
-
-          echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
-
-      - name: Print Increment Strategy
-        shell: bash
-        run: echo "${{ steps.version.outputs.increment }}"
-
       - name: Check Out Code
         uses: actions/checkout@v4
 
