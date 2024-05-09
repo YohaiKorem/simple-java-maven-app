@@ -39,9 +39,44 @@ jobs:
 
           echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
 
-      - name: Print Increment Strategy
+      - name: Increment and Update Version
         shell: bash
-        run: echo "${{ steps.version.outputs.increment }}"
+        run: |
+          INCREMENT="${{ steps.version.outputs.increment }}"
+          VERSION_FILE="version.txt"
+
+          # Retrieve current version
+          if [[ -f "$VERSION_FILE" ]]; then
+            VERSION=$(cat "$VERSION_FILE")
+          else
+            VERSION="0.0.0"
+          fi
+
+          # Split the current version into its components
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          # Increment based on the strategy
+          case "$INCREMENT" in
+            "Minor")
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            "Patch")
+              PATCH=$((PATCH + 1))
+              ;;
+            "Build")
+              BUILD_NUMBER=$(git rev-list --count HEAD)
+              ;;
+          esac
+
+          # Reconstruct the version number
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+
+          # Write the new version back to the file
+          echo "$NEW_VERSION" > "$VERSION_FILE"
+          echo "New Version: $NEW_VERSION"
 
       - name: Check Out Code
         uses: actions/checkout@v4
