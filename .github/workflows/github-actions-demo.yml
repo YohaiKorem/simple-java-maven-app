@@ -29,13 +29,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven
 
-      - name: Increment Version
-        id: version
-        uses: einaregilsson/semver-action@v3
-        with:
-          minor_pattern: 'feat'
-          patch_pattern: 'fix|docs'
-
       - name: Build Maven Package
         run: mvn clean package -DskipTests
 
