@@ -37,25 +37,30 @@ jobs:
           fi
           echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
 
+      - name: Initialize Version File if Absent
+        shell: bash
+        run: |
+          VERSION_FILE="version.txt"
+          if [[ ! -f "$VERSION_FILE" ]]; then
+            echo "0.1.0" > "$VERSION_FILE"
+            echo "Initialized $VERSION_FILE with default version: 0.1.0"
+          fi
+
       - name: Increment and Update Semantic Version
         shell: bash
         run: |
           INCREMENT="${{ steps.version.outputs.increment }}"
           VERSION_FILE="version.txt"
 
-          # Retrieve current version from a file or start fresh
-          if [[ -f "$VERSION_FILE" ]]; then
-            VERSION=$(cat "$VERSION_FILE")
-          else
-            VERSION="0.0.0"
-          fi
+          # Retrieve current version from the file
+          VERSION=$(cat "$VERSION_FILE")
 
           # Extract the semantic version components
           MAJOR=$(echo "$VERSION" | cut -d. -f1)
           MINOR=$(echo "$VERSION" | cut -d. -f2)
           PATCH=$(echo "$VERSION" | cut -d. -f3)
 
-          # Increment based on the determined strategy
+          # Increment based on the strategy
           case "$INCREMENT" in
             "Major")
               MAJOR=$((MAJOR + 1))
