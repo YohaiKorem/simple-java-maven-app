@@ -13,12 +13,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Extract Branch Name
+        id: extract_branch
+        shell: bash
+        run: |
+          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+
+      - name: Determine Version Increment Strategy
+        id: version_strategy
+        shell: bash
+        run: |
+          BRANCH="${{ steps.extract_branch.outputs.branch }}"
+          if [[ "$BRANCH" == "master" ]]; then
+            INCREMENT="minor"
+          elif [[ "$BRANCH" == "dev" ]]; then
+            INCREMENT="patch"
+          else
+            INCREMENT="build"
+          fi
+          echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
+
       - name: Check Out Code
         uses: actions/checkout@v4
 
+      - name: Increment Version Number
+        id: version
+        shell: bash
+        run: |
+          # Replace this with your version file or similar
+          CURRENT_VERSION=$(cat VERSION)
+          INCREMENT="${{ steps.version_strategy.outputs.increment }}"
+
+          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+
+          if [[ "$INCREMENT" == "minor" ]]; then
+            MINOR=$((MINOR+1))
+            PATCH=0
+          elif [[ "$INCREMENT" == "patch" ]]; then
+            PATCH=$((PATCH+1))
+          fi
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo $NEW_VERSION > VERSION
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
       - name: Build Docker Image
         run: |
-          docker build --build-arg="VERSION=1" -t yohaikorem/maven_app:1 .
+          docker build --build-arg="VERSION=${{ steps.version.outputs.new_version }}" -t "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" .
 
       - name: Push Docker Image
         env:
@@ -26,5 +69,13 @@ jobs:
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
-          docker tag yohaikorem/maven_app:1 yohaikorem/maven_app:latest
-          docker push yohaikorem/maven_app:1
+          docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
+          docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
+
+      - name: Push Version File (Optional)
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add VERSION
+          git commit -m "Increment version to ${{ steps.version.outputs.new_version }}"
+          git push
