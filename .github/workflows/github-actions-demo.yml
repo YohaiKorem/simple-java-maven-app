@@ -36,17 +36,24 @@ jobs:
       - name: Check Out Code
         uses: actions/checkout@v4
 
+      - name: Get Latest Tag
+        id: latest_tag
+        shell: bash
+        run: |
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
       - name: Increment Version Number
         id: version
         shell: bash
         run: |
-          # Replace this with your version file or similar
-          CURRENT_VERSION=$(cat VERSION)
+          LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
           INCREMENT="${{ steps.version_strategy.outputs.increment }}"
 
-          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
-          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
-          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+          # Extract version components
+          MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
+          MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+          PATCH=$(echo $LATEST_TAG | cut -d. -f3)
 
           if [[ "$INCREMENT" == "minor" ]]; then
             MINOR=$((MINOR+1))
@@ -56,8 +63,15 @@ jobs:
           fi
 
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-          echo $NEW_VERSION > VERSION
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Tag New Version
+        shell: bash
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag "v${{ steps.version.outputs.new_version }}"
+          git push origin "v${{ steps.version.outputs.new_version }}"
 
       - name: Build Docker Image
         run: |
@@ -71,11 +85,3 @@ jobs:
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
           docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
-
-      - name: Push Version File (Optional)
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add VERSION
-          git commit -m "Increment version to ${{ steps.version.outputs.new_version }}"
-          git push
