@@ -14,4 +14,5 @@ WORKDIR /app
 COPY --from=build /app/target/my-app-1.0-SNAPSHOT.jar /app/app.jar
 # COPY ./scripts/deliver.sh /app/deliver.sh
 EXPOSE 5000
+RUN echo goodbye
 CMD java -jar app.jar
