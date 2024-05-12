@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
+
       - name: Extract Branch Name
         id: extract_branch
         shell: bash
@@ -44,9 +47,6 @@ jobs:
             fi
             echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
           fi
-
-      - name: Check Out Code
-        uses: actions/checkout@v4
 
       - name: Get Latest Tag
         id: latest_tag
