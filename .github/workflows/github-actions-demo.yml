@@ -79,6 +79,13 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo $NEW_VERSION > version.txt
 
+      - name: Debug Output
+        run: |
+          echo "Merged: ${{ github.event.pull_request.merged }}"
+          echo "Base Branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Head Branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Increment: ${{ steps.version_strategy.outputs.increment }}"
+
       - name: Commit and push the new version file
         if: steps.version.outcome == 'success' # Ensure this step runs only if Increment version was successful
         run: |
