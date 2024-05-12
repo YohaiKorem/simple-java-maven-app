@@ -131,3 +131,4 @@ jobs:
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
           docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
+          docker push "yohaikorem/maven_app:latest"
