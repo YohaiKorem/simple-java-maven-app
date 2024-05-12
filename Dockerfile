@@ -3,7 +3,6 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 ARG VERSION
-ENV JAR_ENV=$VERSION
 RUN mvn -B versions:set -DnewVersion=$VERSION
 RUN mvn  clean package
 RUN ls -l /app/target
@@ -12,8 +11,9 @@ WORKDIR /app
 COPY --from=build /app /app
 RUN mvn test
 FROM openjdk:17-jdk-alpine as deliver
+ARG VERSION
 WORKDIR /app
-COPY --from=build /app/target/my-app-$JAR_ENV.jar /app/app.jar
+COPY --from=build /app/target/my-app-$VERSION.jar /app/app.jar
 # COPY ./scripts/deliver.sh /app/deliver.sh
 EXPOSE 5000
 RUN echo yes
