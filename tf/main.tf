@@ -14,7 +14,7 @@ required_version = ">= 1.0.0"
 }
 provider "aws" {
   region  = "eu-west-3"
-  profile = "default"
+  # profile = "default"
 
 }
 
