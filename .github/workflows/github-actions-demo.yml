@@ -40,7 +40,7 @@ jobs:
         id: latest_tag
         shell: bash
         run: |
-          LATEST_TAG=$(cat version.txt) 2>/dev/null)
+          LATEST_TAG=$(cat version.txt 2>/dev/null)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Increment Version Number
