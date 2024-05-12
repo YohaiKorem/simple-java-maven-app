@@ -27,12 +27,12 @@ jobs:
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
 
-      - name: Set Environment Variables for Push
-        if: github.event_name == 'push'
-        run: |
-          echo "BASE_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-          echo "HEAD_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-          echo "PR_MERGED=false" >> $GITHUB_ENV
+      # - name: Set Environment Variables for Push
+      #   if: github.event_name == 'push'
+      #   run: |
+      #     echo "BASE_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      #     echo "HEAD_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      #     echo "PR_MERGED=false" >> $GITHUB_ENV
 
       - name: Extract Branch Name
         id: extract_branch
