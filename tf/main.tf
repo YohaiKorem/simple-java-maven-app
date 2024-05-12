@@ -4,7 +4,7 @@ variable "container_image"{
     default = "yohaikorem/maven_app:0.1.0"
 }
 terraform {
-
+# required_version = ">= 1.0.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
