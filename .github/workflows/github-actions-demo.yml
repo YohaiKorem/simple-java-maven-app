@@ -20,6 +20,20 @@ jobs:
       - name: Check Out Code
         uses: actions/checkout@v4
 
+      - name: Set Environment Variables for PR
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "PR_MERGED=${{ github.event.pull_request.merged }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+
+      - name: Set Environment Variables for Push
+        if: github.event_name == 'push'
+        run: |
+          echo "BASE_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "PR_MERGED=false" >> $GITHUB_ENV
+
       - name: Extract Branch Name
         id: extract_branch
         shell: bash
