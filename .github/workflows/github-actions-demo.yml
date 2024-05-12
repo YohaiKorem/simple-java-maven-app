@@ -34,14 +34,15 @@ jobs:
 
             # Determine the type of version increment needed
             if [[ "$base_branch" == "master" && "$head_branch" =~ hotfix ]]; then
-                echo "version_increment=PATCH" >> $GITHUB_OUTPUT
+                INCREMENT=PATCH
             elif [[ "$base_branch" == "master" && "$head_branch" == "dev" ]]; then
-              echo "version_increment=MINOR" >> $GITHUB_OUTPUT
+              INCREMENT=MINOR
             elif [[ "$base_branch" == "master" ]]; then
-              echo "version_increment=MAJOR" >> $GITHUB_OUTPUT
+              INCREMENT=MAJOR
             else
-              echo "version_increment=none" >> $GITHUB_OUTPUT
+              INCREMENT=MINOR
             fi
+            echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
           fi
 
       - name: Check Out Code
@@ -59,7 +60,7 @@ jobs:
         shell: bash
         run: |
           LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
-          INCREMENT="${{ steps.version_strategy.outputs.version_increment }}"
+          INCREMENT="${{ steps.version_strategy.outputs.increment }}"
 
 
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
@@ -88,7 +89,7 @@ jobs:
             git commit -m "Bump version to $new_version"
             git push origin "${{ steps.extract_branch.outputs.branch }}"
           else
-            echo "new_version=${{ steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+            echo "new_version=${{ steps.version.outputs.new_version }}" >> $GITHUB_OUTPUT
           fi
           echo "new version is: ${{ steps.version.outputs.new_version }}"
 
