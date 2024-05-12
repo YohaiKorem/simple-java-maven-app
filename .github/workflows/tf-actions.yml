@@ -40,5 +40,5 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var container_image=yohaikorem/maven_app
         working-directory: ./tf
