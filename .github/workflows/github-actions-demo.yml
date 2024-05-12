@@ -136,8 +136,8 @@ jobs:
         uses: hashicorp/terraform-github-actions/init@v0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
-          AWS_ACCESS_KEY: ${{AWS_ACCESS_KEY}}
-          AWS_SECRET_KEY: ${{AWS_SECRET_KEY}}
+          AWS_ACCESS_KEY: ${{ AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ AWS_SECRET_KEY }}
           TF_ACTION_WORKING_DIR: 'tf'
 
       - name: Terraform Validate
