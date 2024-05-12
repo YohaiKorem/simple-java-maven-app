@@ -37,6 +37,6 @@ jobs:
         uses: hashicorp/terraform-github-actions/apply@v0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
-          TF_ACTION_WORKING_DIR: 'terraform'
+          TF_ACTION_WORKING_DIR: 'tf'
           AWS_ACCESS_KEY: ${{ secrets.EC2_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.EC2_SECRET_KEY }}
