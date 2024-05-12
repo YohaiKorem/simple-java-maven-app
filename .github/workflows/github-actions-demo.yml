@@ -66,6 +66,21 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo $NEW_VERSION > version.txt
 
+      - name: Commit and push the new version file
+        if: steps.new_version.outcome == 'success' # Ensure this step runs only if Increment version was successful
+        run: |
+          new_version="${{ steps.new_version.outputs.new_version }}"
+          if [[ "$new_version" != "" && "$new_version" != "${{ steps.version.outputs.current_version }}" ]]; then
+            git config --local user.name "GitHub Actions"
+            git config --local user.email "actions@github.com"
+            git add version.txt
+            git commit -m "Bump version to $new_version"
+            git push origin master
+          else
+            echo "new_version=${{ steps.current_version.outputs.current_version }}" >> $GITHUB_OUTPUT
+          fi
+          echo "new version is: ${{ steps.new_version.outputs.new_version }}"
+
       - name: Build Docker Image
         run: |
           docker build --build-arg="VERSION=${{ steps.version.outputs.new_version }}" -t "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" .
