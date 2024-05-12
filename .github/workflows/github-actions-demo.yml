@@ -61,6 +61,7 @@ jobs:
         run: |
           LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
           INCREMENT="${{ steps.version_strategy.outputs.increment }}"
+          echo "${{ steps.version_strategy.outputs.increment }}"
 
 
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
