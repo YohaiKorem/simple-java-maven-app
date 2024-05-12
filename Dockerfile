@@ -2,9 +2,10 @@ FROM maven:3.9.0 as build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn  clean package
 ARG VERSION
 RUN mvn -B versions:set -DnewVersion=$VERSION
+RUN mvn  clean package
+RUN ls -l /app/target
 FROM maven:3.9.0 as test
 WORKDIR /app
 COPY --from=build /app /app
