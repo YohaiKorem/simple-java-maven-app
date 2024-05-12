@@ -59,8 +59,10 @@ jobs:
             else
               INCREMENT=MINOR
             fi
-            echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
+          else
+              INCREMENT=MAJOR
           fi
+          echo "increment=$INCREMENT" >> $GITHUB_OUTPUT
 
       - name: Get Latest Tag
         id: latest_tag
