@@ -17,11 +17,6 @@ jobs:
         with:
           terraform_version: '1.0.0' # Specify the version here
 
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Apply
-        run: terraform apply
       - name: Setup instance with Terraform
         uses: hashicorp/terraform-github-actions/init@v0.4.0
         env:
@@ -33,10 +28,10 @@ jobs:
       - name: Terraform Validate
         uses: hashicorp/terraform-github-actions/validate@v0.3.7
 
+      - name: Terraform Init
+        working-directory: ./tf
+        run: terraform init
+
       - name: Terraform Apply
-        uses: hashicorp/terraform-github-actions/apply@v0.4.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
-          TF_ACTION_WORKING_DIR: 'tf'
-          AWS_ACCESS_KEY: ${{ secrets.EC2_ACCESS_KEY }}
-          AWS_SECRET_KEY: ${{ secrets.EC2_SECRET_KEY }}
+        run: terraform apply
+        working-directory: ./tf
