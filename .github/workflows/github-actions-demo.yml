@@ -132,12 +132,24 @@ jobs:
           docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
 
-      # - name: Setup instance with Terraform
-      #   env:
-      #     AWS_ACCESS_KEY: ${{AWS_ACCESS_KEY}}
-      #     AWS_SECRET_KEY: ${{AWS_SECRET_KEY}}
-      #   run: |
+      - name: Setup instance with Terraform
+        uses: hashicorp/terraform-github-actions/init@v0.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
+          AWS_ACCESS_KEY: ${{AWS_ACCESS_KEY}}
+          AWS_SECRET_KEY: ${{AWS_SECRET_KEY}}
+          TF_ACTION_WORKING_DIR: 'tf'
 
+      - name: Terraform Validate
+        uses: hashicorp/terraform-github-actions/validate@v0.3.7
+
+      - name: Terraform Apply
+        uses: hashicorp/terraform-github-actions/apply@v0.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
+          TF_ACTION_WORKING_DIR: 'terraform'
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
       # - name: Setup ssh
       #   shell: bash
       #   run: |

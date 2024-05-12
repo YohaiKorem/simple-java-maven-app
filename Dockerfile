@@ -16,5 +16,5 @@ WORKDIR /app
 COPY --from=build /app/target/my-app-$VERSION.jar /app/app.jar
 # COPY ./scripts/deliver.sh /app/deliver.sh
 EXPOSE 5000
-RUN echo yes
+RUN echo yes_no
 CMD java -jar app.jar
