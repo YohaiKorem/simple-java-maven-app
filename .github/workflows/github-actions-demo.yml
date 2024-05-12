@@ -86,7 +86,7 @@ jobs:
             git config --local user.name "GitHub Actions"
             git config --local user.email "actions@github.com"
             git add version.txt
-            git commit -m "Bump version to $new_version"
+            git diff --staged --exit-code || git commit -m "Bump version to $new_version"
             git push origin "${{ steps.extract_branch.outputs.branch }}"
           else
             echo "new_version=${{ steps.version.outputs.new_version }}" >> $GITHUB_OUTPUT
