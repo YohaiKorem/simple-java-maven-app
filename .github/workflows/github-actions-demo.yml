@@ -40,7 +40,7 @@ jobs:
         id: latest_tag
         shell: bash
         run: |
-          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "0.0.0")
+          LATEST_TAG=$(cat version.txt) 2>/dev/null)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Increment Version Number
@@ -50,7 +50,7 @@ jobs:
           LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
           INCREMENT="${{ steps.version_strategy.outputs.increment }}"
 
-          # Extract version components
+
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
           MINOR=$(echo $LATEST_TAG | cut -d. -f2)
           PATCH=$(echo $LATEST_TAG | cut -d. -f3)
@@ -65,14 +65,6 @@ jobs:
           NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Tag New Version
-        shell: bash
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git tag "v${{ steps.version.outputs.new_version }}"
-          git push origin "v${{ steps.version.outputs.new_version }}"
-
       - name: Build Docker Image
         run: |
           docker build --build-arg="VERSION=${{ steps.version.outputs.new_version }}" -t "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" .
@@ -85,3 +77,31 @@ jobs:
           echo "${DOCKER_HUB_PASSWORD}" | docker login -u "${DOCKER_HUB_USERNAME}" --password-stdin
           docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
+
+      # - name: Setup instance with Terraform
+      #   env:
+      #     AWS_ACCESS_KEY: ${{AWS_ACCESS_KEY}}
+      #     AWS_SECRET_KEY: ${{AWS_SECRET_KEY}}
+      #   run: |
+
+      # - name: Setup ssh
+      #   shell: bash
+      #   run: |
+      #     service ssh status
+      #     eval `ssh-agent -s`
+      #     mkdir -p /home/runner/.ssh/
+      #     touch /home/runner/.ssh/id_rsa
+      #     echo -e "${{secrets.SSH_KEY}}" > /home/runner/.ssh/id_rsa
+      #     chmod 700 /home/runner/.ssh/id_rsa
+      #     ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
+
+      # - name: Run ansible script
+      #   shell: bash
+      #   run: |
+      #     service ssh status
+      #     cat setup-prod.yml
+      #     ansible-playbook -vvv --private-key /home/runner/.ssh/id_rsa -u ${{secrets.ANSIBLE_DEPLOY_USER}} -i hosts.yml setup-prod.yml
+
+      # - name: Deploy app
+      #   run: |
+      #     "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
