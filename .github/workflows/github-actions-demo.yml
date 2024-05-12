@@ -34,13 +34,13 @@ jobs:
 
             # Determine the type of version increment needed
             if [[ "$base_branch" == "master" && "$head_branch" =~ hotfix ]]; then
-                echo "version_increment_type=PATCH" >> $GITHUB_OUTPUT
+                echo "version_increment=PATCH" >> $GITHUB_OUTPUT
             elif [[ "$base_branch" == "master" && "$head_branch" == "dev" ]]; then
-              echo "version_increment_type=MINOR" >> $GITHUB_OUTPUT
+              echo "version_increment=MINOR" >> $GITHUB_OUTPUT
             elif [[ "$base_branch" == "master" ]]; then
-              echo "version_increment_type=MAJOR" >> $GITHUB_OUTPUT
+              echo "version_increment=MAJOR" >> $GITHUB_OUTPUT
             else
-              echo "version_increment_type=none" >> $GITHUB_OUTPUT
+              echo "version_increment=none" >> $GITHUB_OUTPUT
             fi
           fi
 
@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: |
           LATEST_TAG="${{ steps.latest_tag.outputs.latest_tag }}"
-          INCREMENT="${{ steps.version_strategy.outputs.increment }}"
+          INCREMENT="${{ steps.version_strategy.outputs.version_increment }}"
 
 
           MAJOR=$(echo $LATEST_TAG | cut -d. -f1)
