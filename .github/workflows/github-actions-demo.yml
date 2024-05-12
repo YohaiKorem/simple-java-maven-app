@@ -79,7 +79,7 @@ jobs:
           else
             echo "new_version=${{ steps.version.outputs.version }}" >> $GITHUB_OUTPUT
           fi
-          echo "new version is: ${{ steps.new_version.outputs.new_version }}"
+          echo "new version is: ${{ steps.version.outputs.new_version }}"
 
       - name: Build Docker Image
         run: |
