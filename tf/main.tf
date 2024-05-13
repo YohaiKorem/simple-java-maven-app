@@ -60,16 +60,20 @@ resource "aws_eks_cluster" "example" {
 
 
 resource "aws_eks_node_group" "example" {
+  depends_on = [
+    aws_eks_cluster.example
+  ]
+
   cluster_name    = "popo"
   node_group_name = "node-group"
   node_role_arn   = "arn:aws:iam::891377164650:role/EKSNodeRole"
   subnet_ids      = ["subnet-0dc4e8cb069359a9b", "subnet-0f38494490a77c8c5 "]
-
   scaling_config {
     desired_size = 1
     max_size     = 3
     min_size     = 1
   }
+
 
   ami_type = "AL2_x86_64"
   instance_types = ["t3.small"]
