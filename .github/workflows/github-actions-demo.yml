@@ -15,7 +15,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
     steps:
       - name: Check Out Code
         uses: actions/checkout@v4
@@ -135,7 +136,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      IMAGE_TAG: 'yohaikorem/maven_app:${{ steps.version.outputs.new_version }}'
+      IMAGE_TAG: 'yohaikorem/maven_app:${{ needs.build.outputs.new_version }}'
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
