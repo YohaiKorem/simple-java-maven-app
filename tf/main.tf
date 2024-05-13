@@ -49,6 +49,16 @@ resource "aws_instance" "instance_from_registry_sec_group" {
               EOF
 }
 
+resource "aws_eks_cluster" "example" {
+  name     = "popo"
+  role_arn = "arn:aws:iam::891377164650:role/EKSClusterRole"
+
+  vpc_config {
+    subnet_ids = ["subnet-0dc4e8cb069359a9b"]
+  }
+}
+
+
 resource "aws_eks_node_group" "example" {
   cluster_name    = "popo"
   node_group_name = "node-group"
