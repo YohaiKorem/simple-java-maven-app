@@ -148,4 +148,4 @@ jobs:
           REGISTRY: dockerhub
           IMAGE_TAG: 'yohaikorem/maven_app:${{ steps.version.outputs.new_version }}'
         run: |
-          sed -i 's/$IMAGE/${{ IMAGE_TAG }}/g' deployments.yaml | kubectl apply -f deployments.yaml
+          sed -i 's/$IMAGE/${{ IMAGE_TAG }}/g' manifests/deployments.yaml | kubectl apply -f deployments.yaml
