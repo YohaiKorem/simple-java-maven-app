@@ -147,10 +147,10 @@ jobs:
           aws-region: eu-west-3
 
       - name: Update kube config
-        run: aws eks update-kubeconfig --name CLUESTER_NAME --region eu-wets-3
+        run: aws eks update-kubeconfig --name popo --region eu-wets-3
 
       - name: Deploy to EKS
         env:
           REGISTRY: dockerhub
         run: |
-          sed -i 's/$IMAGE/${{ IMAGE_TAG }}/g' manifests/deployments.yaml | kubectl apply -f deployments.yaml
+          sed -i 's/$IMAGE/${{ env.IMAGE_TAG }}/g' manifests/deployments.yaml | kubectl apply -f deployments.yaml
