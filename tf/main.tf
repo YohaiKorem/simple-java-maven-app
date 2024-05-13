@@ -15,6 +15,9 @@ backend "s3" {
 
 
   required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+    }
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.7.0"
