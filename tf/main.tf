@@ -49,23 +49,18 @@ resource "aws_instance" "instance_from_registry_sec_group" {
               EOF
 }
 
-resource "eks_managed_node_groups" "cluster" {
-one = {
-    name = "node-group-1"
+resource "aws_eks_node_group" "example" {
+  cluster_name    = "cluster-name"
+  node_group_name = "node-group"
+  node_role_arn   = "arn:aws:iam::891377164650:role/EKSNodeRole"
+  subnet_ids      = ["subnet-0dc4e8cb069359a9b"]
 
-    instance_types = ["t3.small"]
-
-    min_size     = 1
-    max_size     = 3
-    desired_size = 2
-}
-two = {
-    name = "node-group-2"
-
-    instance_types = ["t3.small"]
-
-    min_size     = 1
-    max_size     = 2
+  scaling_config {
     desired_size = 1
-}
+    max_size     = 3
+    min_size     = 1
+  }
+
+  ami_type = "AL2_x86_64"
+  instance_types = ["t3.small"]
 }
