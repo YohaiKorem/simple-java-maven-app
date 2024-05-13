@@ -67,7 +67,7 @@ resource "aws_eks_node_group" "example" {
   cluster_name    = "popo"
   node_group_name = "node-group"
   node_role_arn   = "arn:aws:iam::891377164650:role/AWSServiceRoleForAmazonEKS"
-  subnet_ids      = ["subnet-0dc4e8cb069359a9b", "subnet-0f38494490a77c8c5 "]
+  subnet_ids      = ["subnet-0dc4e8cb069359a9b", "subnet-0f38494490a77c8c5"]
   scaling_config {
     desired_size = 1
     max_size     = 3
