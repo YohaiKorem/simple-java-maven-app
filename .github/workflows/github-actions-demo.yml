@@ -132,7 +132,11 @@ jobs:
           docker tag "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}" yohaikorem/maven_app:latest
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
           docker push "yohaikorem/maven_app:latest"
-
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: 'yohaikorem/maven_app:${{ steps.version.outputs.new_version }}'
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -146,6 +150,5 @@ jobs:
       - name: Deploy to EKS
         env:
           REGISTRY: dockerhub
-          IMAGE_TAG: 'yohaikorem/maven_app:${{ steps.version.outputs.new_version }}'
         run: |
           sed -i 's/$IMAGE/${{ IMAGE_TAG }}/g' manifests/deployments.yaml | kubectl apply -f deployments.yaml
