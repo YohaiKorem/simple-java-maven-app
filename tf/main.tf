@@ -46,4 +46,23 @@ resource "aws_instance" "instance_from_registry_sec_group" {
               EOF
 }
 
+resource "eks_managed_node_groups" "cluster" {
+one = {
+    name = "node-group-1"
 
+    instance_types = ["t3.small"]
+
+    min_size     = 1
+    max_size     = 3
+    desired_size = 2
+}
+two = {
+    name = "node-group-2"
+
+    instance_types = ["t3.small"]
+
+    min_size     = 1
+    max_size     = 2
+    desired_size = 1
+}
+}
