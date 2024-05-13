@@ -134,6 +134,7 @@ jobs:
           docker push "yohaikorem/maven_app:${{ steps.version.outputs.new_version }}"
           docker push "yohaikorem/maven_app:latest"
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: 'yohaikorem/maven_app:${{ needs.build.outputs.new_version }}'
