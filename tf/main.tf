@@ -28,37 +28,37 @@ provider "aws" {
   region = "eu-west-3"
 }
 
-resource "aws_iam_role" "eks_node_group_role" {
-  name = "EKSNodeRole"
+# resource "aws_iam_role" "eks_node_group_role" {
+#   name = "EKSNodeRole"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "sts:AssumeRole"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "ec2.amazonaws.com"
+#         }
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy_attachment" "eks_node_group_policy_attachment" {
-  role       = aws_iam_role.eks_node_group_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-}
+# resource "aws_iam_role_policy_attachment" "eks_node_group_policy_attachment" {
+#   role       = aws_iam_role.eks_node_group_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+# }
 
-resource "aws_iam_role_policy_attachment" "eks_cni_policy_attachment" {
-  role       = aws_iam_role.eks_node_group_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-}
+# resource "aws_iam_role_policy_attachment" "eks_cni_policy_attachment" {
+#   role       = aws_iam_role.eks_node_group_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+# }
 
-resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
-  role       = aws_iam_role.eks_node_group_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
+# resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
+#   role       = aws_iam_role.eks_node_group_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+# }
 
 resource "aws_eks_cluster" "example" {
   name     = "popo"
@@ -72,15 +72,15 @@ resource "aws_eks_cluster" "example" {
 resource "aws_eks_node_group" "example" {
   depends_on = [
     aws_eks_cluster.example,
-    aws_iam_role.eks_node_group_role,
-    aws_iam_role_policy_attachment.eks_node_group_policy_attachment,
-    aws_iam_role_policy_attachment.eks_cni_policy_attachment,
-    aws_iam_role_policy_attachment.ec2_container_registry_readonly
+    # aws_iam_role.eks_node_group_role,
+    # aws_iam_role_policy_attachment.eks_node_group_policy_attachment,
+    # aws_iam_role_policy_attachment.eks_cni_policy_attachment,
+    # aws_iam_role_policy_attachment.ec2_container_registry_readonly
   ]
 
   cluster_name    = aws_eks_cluster.example.name
   node_group_name = "node-group"
-  node_role_arn   = aws_iam_role.eks_node_group_role.arn
+  node_role_arn   = "arn:aws:iam::891377164650:role/EKSNodeRole"
   subnet_ids      = ["subnet-0dc4e8cb069359a9b", "subnet-0f38494490a77c8c5"]
 
   scaling_config {
