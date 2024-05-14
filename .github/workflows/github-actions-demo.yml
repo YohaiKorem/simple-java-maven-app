@@ -165,4 +165,4 @@ jobs:
         env:
           REGISTRY: dockerhub
         run: |
-          sed -i 's/$IMAGE/${{ env.IMAGE_TAG }}/g' manifests/deployments.yaml | kubectl apply -f manifests/deployments.yaml
+          sed -i 's|\$IMAGE|${{ env.IMAGE_TAG }}|g' manifests/deployments.yaml | kubectl apply -f manifests/deployments.yaml
