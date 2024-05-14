@@ -146,6 +146,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.EC2_SECRET_KEY }}
           aws-region: eu-west-3
 
+      - name: Wait for EKS cluster to be ACTIVE
+        run: |
+          while true; do
+            STATUS=$(aws eks describe-cluster --name popo --query "cluster.status" --output text)
+            echo "Cluster status: $STATUS"
+            if [ "$STATUS" == "ACTIVE" ]; then
+              break
+            fi
+            echo "Waiting for EKS cluster to be ACTIVE..."
+            sleep 30
+          done
+
       - name: Update kube config
         run: aws eks update-kubeconfig --name popo --region eu-west-3
 
