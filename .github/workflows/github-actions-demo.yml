@@ -147,7 +147,7 @@ jobs:
           aws-region: eu-west-3
 
       - name: Update kube config
-        run: aws eks update-kubeconfig --name popo --region eu-wets-3
+        run: aws eks update-kubeconfig --name popo --region eu-west-3
 
       - name: Deploy to EKS
         env:
