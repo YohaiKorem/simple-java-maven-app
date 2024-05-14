@@ -139,6 +139,8 @@ jobs:
     env:
       IMAGE_TAG: 'yohaikorem/maven_app:${{ needs.build.outputs.new_version }}'
     steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -166,4 +168,4 @@ jobs:
           REGISTRY: dockerhub
         run: |
           pwd
-          sed -i 's|\$IMAGE|${{ env.IMAGE_TAG }}|g' ./manifests/deployments.yaml | kubectl apply -f ./manifests/deployments.yaml
+          sed -i 's|\$IMAGE|${{ env.IMAGE_TAG }}|g' manifests/deployments.yaml | kubectl apply -f manifests/deployments.yaml
