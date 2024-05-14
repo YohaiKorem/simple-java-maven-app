@@ -103,5 +103,5 @@ data "aws_iam_role" "existing_eks_node_group_role" {
 }
 
 locals {
-  eks_node_group_role_arn = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? aws_iam_role.eks_node_group_role.arn : data.aws_iam_role.existing_eks_node_group_role.arn
+  eks_node_group_role_arn = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? aws_iam_role.eks_node_group_role[0].arn : data.aws_iam_role.existing_eks_node_group_role[0].arn
 }
