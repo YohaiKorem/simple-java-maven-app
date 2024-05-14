@@ -28,18 +28,8 @@ provider "aws" {
   region = "eu-west-3"
 }
 
-data "aws_iam_role" "existing_eks_node_group_role" {
-  name = "EKSNodeRole"
-  ignore_errors = true
-}
-
-locals {
-  eks_node_group_role_exists = data.aws_iam_role.existing_eks_node_group_role.id != ""
-  eks_node_group_role_arn = local.eks_node_group_role_exists ? data.aws_iam_role.existing_eks_node_group_role.arn : aws_iam_role.eks_node_group_role.arn
-}
-
 resource "aws_iam_role" "eks_node_group_role" {
-  count = local.eks_node_group_role_exists ? 0 : 1
+  count = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
   name  = "EKSNodeRole"
 
   assume_role_policy = jsonencode({
@@ -57,20 +47,20 @@ resource "aws_iam_role" "eks_node_group_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_group_policy_attachment" {
-  count      = local.eks_node_group_role_exists ? 0 : 1
-  role       = aws_iam_role.eks_node_group_role.name
+  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  role       = "EKSNodeRole"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy_attachment" {
-  count      = local.eks_node_group_role_exists ? 0 : 1
-  role       = aws_iam_role.eks_node_group_role.name
+  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  role       = "EKSNodeRole"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
-  count      = local.eks_node_group_role_exists ? 0 : 1
-  role       = aws_iam_role.eks_node_group_role.name
+  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  role       = "EKSNodeRole"
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
@@ -105,4 +95,13 @@ resource "aws_eks_node_group" "example" {
 
   ami_type       = "AL2_x86_64"
   instance_types = ["t3.small"]
+}
+
+data "aws_iam_role" "existing_eks_node_group_role" {
+  count = 1
+  name  = "EKSNodeRole"
+}
+
+locals {
+  eks_node_group_role_arn = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? aws_iam_role.eks_node_group_role.arn : data.aws_iam_role.existing_eks_node_group_role.arn
 }
