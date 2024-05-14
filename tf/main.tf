@@ -28,13 +28,8 @@ provider "aws" {
   region = "eu-west-3"
 }
 
-data "aws_iam_role" "existing_eks_node_group_role" {
-  count = 1
-  name  = "EKSNodeRole"
-}
-
 resource "aws_iam_role" "eks_node_group_role" {
-  count = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  count = var.create_iam_role ? 1 : 0
   name  = "EKSNodeRole"
 
   assume_role_policy = jsonencode({
@@ -52,19 +47,19 @@ resource "aws_iam_role" "eks_node_group_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_group_policy_attachment" {
-  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  count      = var.create_iam_role ? 1 : 0
   role       = aws_iam_role.eks_node_group_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy_attachment" {
-  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  count      = var.create_iam_role ? 1 : 0
   role       = aws_iam_role.eks_node_group_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
-  count      = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? 1 : 0
+  count      = var.create_iam_role ? 1 : 0
   role       = aws_iam_role.eks_node_group_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
@@ -104,4 +99,15 @@ resource "aws_eks_node_group" "example" {
 
 locals {
   eks_node_group_role_arn = length([for role in data.aws_iam_role.existing_eks_node_group_role : role.id]) == 0 ? aws_iam_role.eks_node_group_role[0].arn : data.aws_iam_role.existing_eks_node_group_role[0].arn
+}
+
+data "aws_iam_role" "existing_eks_node_group_role" {
+  count = var.create_iam_role ? 0 : 1
+  name  = "EKSNodeRole"
+}
+
+variable "create_iam_role" {
+  description = "Whether to create a new IAM role or use an existing one"
+  type        = bool
+  default     = true
 }
